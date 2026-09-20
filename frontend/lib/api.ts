@@ -323,11 +323,14 @@ export async function seedDemoClaim(): Promise<Claim> {
 
 export async function analyzeClaim(claimId: string): Promise<ProofChainAnalysisResponse> {
   const encodedId = encodeURIComponent(claimId);
+  let lastError = "Evidence package analysis is unavailable.";
 
   // Endpoint 1: POST /analysis/claim/{claimId}
   try {
     const res1 = await fetch(`${BACKEND_URL}/analysis/claim/${encodedId}`, { method: "POST" });
     if (res1.ok) return await res1.json();
+    const body = await res1.json().catch(() => null);
+    lastError = body?.detail || `Analysis failed with status ${res1.status}.`;
   } catch (err) {
     console.warn("POST /analysis/claim/ failed, trying GET /claims/analyze", err);
   }
@@ -336,6 +339,8 @@ export async function analyzeClaim(claimId: string): Promise<ProofChainAnalysisR
   try {
     const res2 = await fetch(`${BACKEND_URL}/claims/${encodedId}/analyze`);
     if (res2.ok) return await res2.json();
+    const body = await res2.json().catch(() => null);
+    lastError = body?.detail || lastError;
   } catch (err) {
     console.warn("GET /claims/analyze failed, using local offline fallback analysis", err);
   }
@@ -344,9 +349,11 @@ export async function analyzeClaim(claimId: string): Promise<ProofChainAnalysisR
   try {
     const res3 = await fetch(`${BACKEND_URL}/claims/${encodedId}/analyze`, { method: "POST" });
     if (res3.ok) return await res3.json();
+    const body = await res3.json().catch(() => null);
+    lastError = body?.detail || lastError;
   } catch (err) {
     console.warn("POST /claims/analyze failed", err);
   }
 
-  throw new Error("Evidence package analysis is unavailable. Start the backend and try again.");
+  throw new Error(lastError);
 }
