@@ -229,7 +229,7 @@ export async function uploadEvidenceFile(
       claimIdStr = String(claimIdOrFormData);
     }
 
-    const res = await fetch(`${BACKEND_URL}/claims/${encodeURIComponent(claimIdStr)}/evidence`, {
+    const res = await fetch(`${BACKEND_URL}/evidence/upload`, {
       method: "POST",
       body,
     });
