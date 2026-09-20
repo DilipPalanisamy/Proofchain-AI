@@ -114,7 +114,13 @@ export interface ProofChainAnalysisResponse {
   limitations?: string[];
 }
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  (process.env.NODE_ENV === "production"
+    ? "https://proofchain-ai-backend.onrender.com"
+    : "http://localhost:8000");
+
+export const backendUrl = BACKEND_URL;
 
 export type EvidenceType = "DOCUMENT" | "IMAGE" | "DATA" | "TEXT" | "OTHER";
 

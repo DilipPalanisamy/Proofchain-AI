@@ -8,3 +8,7 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.8
+      - key: FRONTEND_URL
+        value: https://dilippalanisamy.github.io/Proofchain-AI
+      - key: GOOGLE_REDIRECT_URI
+        value: https://proofchain-ai-backend.onrender.com/auth/google/callback

@@ -16,6 +16,7 @@ import {
   FileCheck,
   Info,
 } from "lucide-react";
+import { backendUrl } from "../../lib/api";
 
 const GOOGLE_CLIENT_ID =
   process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
@@ -140,20 +141,7 @@ function LoginContent() {
   };
 
   const handleGoogleClick = () => {
-    try {
-      const params = new URLSearchParams({
-        client_id: GOOGLE_CLIENT_ID,
-        redirect_uri: getGoogleRedirectUri(),
-        response_type: "id_token token",
-        scope: "openid email profile",
-        prompt: "select_account",
-        nonce: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-      });
-      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-      window.location.href = googleAuthUrl;
-    } catch {
-      setErrors({ general: "Google sign-in could not be started. Please try again." });
-    }
+    window.location.href = `${backendUrl}/auth/google/login`;
   };
 
   const handleFillDemo = () => {

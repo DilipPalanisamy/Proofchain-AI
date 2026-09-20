@@ -16,6 +16,7 @@ GOOGLE_CLIENT_SECRET = os.getenv(
 GOOGLE_REDIRECT_URI = os.getenv(
     "GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/google/callback"
 )
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 
 @router.get("/google/login", summary="Redirect to Google OAuth Consent Screen")
@@ -78,7 +79,7 @@ def google_callback(code: str = Query(..., description="Authorization code from 
     name = user_info.get("name", email.split("@")[0] if email else "Google User")
 
     # 3. Redirect back to frontend dashboard with session parameters
-    frontend_url = "http://localhost:3000/login"
+    frontend_url = f"{FRONTEND_URL.rstrip('/')}/login/"
     redirect_params = urllib.parse.urlencode({
         "google_auth": "success",
         "email": email,
