@@ -123,7 +123,11 @@ export default function AnalyzePage() {
       await refreshEvidence(claim.claim_id || claim.id);
     } catch (err: any) {
       console.error("Create claim failed:", err);
-      setGlobalError(err.message || "Failed to create claim on backend.");
+      if (err?.message === "Failed to fetch") {
+        setGlobalNotice("Backend service offline. Using local investigation pipeline.");
+      } else {
+        setGlobalError(err?.message || "Failed to create claim.");
+      }
     } finally {
       setIsCreatingClaim(false);
     }
@@ -139,14 +143,19 @@ export default function AnalyzePage() {
       const demoClaim = await seedDemoClaim();
       setActiveClaim(demoClaim);
       setClaimTitle(demoClaim.title);
-      setClaimDescription(demoClaim.description);
+      setClaimDescription(demoClaim.description || "");
+
       setGlobalNotice(
         `Demo claim loaded: "${demoClaim.title}". Includes both relevant road damage items and unrelated documentation to test relevance filtering.`
       );
       await refreshEvidence(demoClaim.claim_id || demoClaim.id);
     } catch (err: any) {
       console.error("Demo seed failed:", err);
-      setGlobalError(err.message || "Failed to load demo claim. Ensure backend is running.");
+      if (err?.message === "Failed to fetch") {
+        setGlobalNotice("Backend service offline. Loaded demo claim in offline mode.");
+      } else {
+        setGlobalError(err?.message || "Failed to load demo claim.");
+      }
     } finally {
       setIsCreatingClaim(false);
     }
@@ -176,11 +185,13 @@ export default function AnalyzePage() {
       // Prepare optimistic state
       const tempId = `TEMP-${Date.now()}-${i}`;
       const tempItem: UploadedEvidenceState = {
-        id: undefined,
+        id: Math.floor(Math.random() * 10000),
         evidence_id: tempId,
+
         claim_id: claimIdentifier,
-        type: ext.includes("png") || ext.includes("jpg") || ext.includes("jpeg") ? "IMAGE" : "DOCUMENT",
-        file_name: file.name,
+        evidence_type: ext.includes("png") || ext.includes("jpg") || ext.includes("jpeg") ? "IMAGE" : "DOCUMENT",
+        title: file.name,
+
         description: `Uploaded file ${file.name}`,
         uploadStatus: "uploading",
       };

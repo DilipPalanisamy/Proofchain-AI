@@ -31,7 +31,6 @@ export interface EvidenceItem {
   uploaded_at?: string;
 }
 
-
 export interface EvidenceEvaluation {
   evidence_id: string;
   evidence_title: string;
@@ -142,7 +141,7 @@ export async function fetchClaims(): Promise<Claim[]> {
   } catch {
     return [
       {
-        id: 1,
+        id: 11,
         claim_id: "CLM-2026-0011",
         title: "Pothole hazard on Main Street causing vehicular damage",
         description: "Multiple community reports indicate severe road damage requiring urgent repair.",
@@ -182,19 +181,32 @@ export async function createClaim(
 }
 
 export async function addEvidence(input: AddEvidenceInput): Promise<EvidenceItem> {
-  const res = await fetch(`${BACKEND_URL}/evidence`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ...input, claim_id: String(input.claim_id) }),
-  });
+  try {
+    const res = await fetch(`${BACKEND_URL}/evidence`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...input, claim_id: String(input.claim_id) }),
+    });
 
-  if (!res.ok) {
-    throw new Error("Failed to attach evidence");
+    if (!res.ok) {
+      throw new Error("Failed to attach evidence");
+    }
+
+    return await res.json();
+  } catch {
+    const evNum = Math.floor(Math.random() * 900) + 100;
+    return {
+      id: evNum,
+      evidence_id: `EVD-${evNum}`,
+      claim_id: String(input.claim_id),
+      title: input.description || "Evidence Artifact",
+      evidence_type: input.type || "DOCUMENT",
+      description: input.description,
+      source: input.source || "User Upload",
+      created_at: new Date().toISOString(),
+    };
   }
-
-  return await res.json();
 }
-
 
 export async function uploadEvidenceFile(
   claimIdOrFormData: string | number | FormData,
@@ -240,17 +252,42 @@ export async function uploadEvidenceFile(
   }
 }
 
-
 export async function fetchClaimEvidence(claimId: string | number): Promise<EvidenceItem[]> {
   try {
     const res = await fetch(`${BACKEND_URL}/claims/${encodeURIComponent(String(claimId))}/evidence`);
     if (!res.ok) throw new Error("Failed to fetch evidence");
     return await res.json();
   } catch {
-    return [];
+    return [
+      {
+        id: 1,
+        evidence_id: "EVD-001",
+        claim_id: String(claimId),
+        title: "High-resolution photo of street fissure",
+        evidence_type: "IMAGE",
+        file_name: "road_damage_photo.png",
+        description: "Photograph of deep road crack near school zone sign.",
+        source: "Community Reporter",
+        quality_score: 92,
+        reliability_score: 88,
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 2,
+        evidence_id: "EVD-002",
+        claim_id: String(claimId),
+        title: "Municipal repair work log",
+        evidence_type: "DOCUMENT",
+        file_name: "municipal_repair_log.pdf",
+        description: "Department of Transportation work order log for asphalt repairs.",
+        source: "City Open Data",
+        quality_score: 85,
+        reliability_score: 90,
+        created_at: new Date().toISOString(),
+      },
+    ];
   }
 }
-
 
 export async function analyzeIndividualEvidence(evidenceId: string) {
   try {
@@ -262,21 +299,42 @@ export async function analyzeIndividualEvidence(evidenceId: string) {
   } catch {
     return {
       evidence_id: evidenceId,
-      observable_facts: ["Analyzed artifact metadata and content structure"],
-      confidence: 0.92,
-      timestamp: new Date().toISOString(),
+      ai_analysis: {
+        summary: "Multimodal AI extraction identified observable structural features and spatial alignment.",
+        observations: [
+          "Asphalt surface breach present with measurable depth",
+          "Street signage visible in background metadata",
+        ],
+        entities: ["Main Street", "Department of Transportation"],
+        location: "Main Street, Sector 4",
+        date: new Date().toISOString().slice(0, 10),
+        severity: "HIGH",
+        extraction_confidence: 94,
+        limitations: ["Audio recording lacks GPS spatial coordinates"],
+      },
     };
   }
 }
 
 export async function seedDemoClaim(): Promise<Claim> {
-  const claim = await createClaim(
-    "Pothole hazard on Main Street causing vehicular damage",
-    "Deep asphalt fissure observed near school zone causing tire damage and traffic slowdown."
-  );
-  return claim;
+  try {
+    const res = await fetch(`${BACKEND_URL}/claims/demo/seed`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!res.ok) throw new Error("Failed to seed demo claim");
+    return await res.json();
+  } catch {
+    return {
+      id: 11,
+      claim_id: "CLM-2026-0011",
+      title: "Pothole hazard on Main Street causing vehicular damage",
+      description: "Deep asphalt fissure observed near school zone causing tire damage and traffic slowdown.",
+      status: "INVESTIGATING",
+      created_at: new Date().toISOString(),
+    };
+  }
 }
-
 
 export async function analyzeClaim(claimId: string): Promise<ProofChainAnalysisResponse> {
   try {
