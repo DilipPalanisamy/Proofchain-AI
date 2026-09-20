@@ -16,32 +16,7 @@ import {
   FileCheck,
   Info,
 } from "lucide-react";
-
-const GOOGLE_CLIENT_ID =
-  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
-  "1077914640486-ol0ln1t4iuv2j3q7i1q1sibdl7kasq34.apps.googleusercontent.com";
-
-function getGoogleRedirectUri() {
-  if (process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI) {
-    return process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
-  }
-
-  return typeof window === "undefined"
-    ? ""
-    : `${window.location.origin}${window.location.pathname}`;
-}
-
-function decodeGoogleCredential(credential: string) {
-  try {
-    const payload = credential.split(".")[1];
-    return JSON.parse(window.atob(payload.replace(/-/g, "+").replace(/_/g, "/"))) as {
-      email?: string;
-      name?: string;
-    };
-  } catch {
-    return null;
-  }
-}
+import { backendUrl } from "../../lib/api";
 
 function redirectToAnalyzePage() {
   if (typeof window === "undefined") return;
@@ -77,53 +52,25 @@ function LoginContent() {
     if (typeof window === "undefined") return;
 
     const googleAuth = searchParams.get("google_auth");
-    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-    const credential = hashParams.get("id_token");
-    const accessToken = hashParams.get("access_token");
-    const profile = credential ? decodeGoogleCredential(credential) : null;
-    const oauthError = searchParams.get("error") || hashParams.get("error");
+    const oauthError = searchParams.get("error");
 
     if (oauthError) {
       setErrors({
         general:
           searchParams.get("error_description") ||
-          hashParams.get("error_description") ||
           `Google sign-in notice: ${oauthError}`,
       });
       return;
     }
 
-    if (googleAuth === "success" || profile?.email) {
-      const userEmail = profile?.email || searchParams.get("email") || "google_user@proofchain.ai";
-      const userName = profile?.name || searchParams.get("name") || "Google User";
+    if (googleAuth === "success") {
+      const userEmail = searchParams.get("email");
+      const userName = searchParams.get("name");
       localStorage.setItem("proofchain_logged_in", "true");
-      localStorage.setItem("proofchain_user_email", userEmail);
-      localStorage.setItem("proofchain_user_name", userName);
+      if (userEmail) localStorage.setItem("proofchain_user_email", userEmail);
+      if (userName) localStorage.setItem("proofchain_user_name", userName);
       window.history.replaceState(null, "", window.location.pathname);
       redirectToAnalyzePage();
-      return;
-    }
-
-    if (accessToken) {
-      fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((googleProfile) => {
-          const emailToUse = googleProfile?.email || "google_user@proofchain.ai";
-          const nameToUse = googleProfile?.name || "Google User";
-          localStorage.setItem("proofchain_logged_in", "true");
-          localStorage.setItem("proofchain_user_email", emailToUse);
-          localStorage.setItem("proofchain_user_name", nameToUse);
-          window.history.replaceState(null, "", window.location.pathname);
-          redirectToAnalyzePage();
-        })
-        .catch(() => {
-          localStorage.setItem("proofchain_logged_in", "true");
-          localStorage.setItem("proofchain_user_email", "google_user@proofchain.ai");
-          localStorage.setItem("proofchain_user_name", "Google User");
-          redirectToAnalyzePage();
-        });
       return;
     }
   }, [searchParams, router]);
@@ -171,38 +118,7 @@ function LoginContent() {
     setIsSubmitting(true);
     setErrors({});
     setGoogleNotice("Signing in with Google...");
-
-    if (typeof window !== "undefined") {
-      localStorage.setItem("proofchain_logged_in", "true");
-      localStorage.setItem("proofchain_user_email", "google_user@proofchain.ai");
-      localStorage.setItem("proofchain_user_name", "Google User");
-    }
-
-    const hasCustomClientId =
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID &&
-      process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID !==
-        "1077914640486-ol0ln1t4iuv2j3q7i1q1sibdl7kasq34.apps.googleusercontent.com";
-
-    if (hasCustomClientId) {
-      try {
-        const params = new URLSearchParams({
-          client_id: GOOGLE_CLIENT_ID,
-          redirect_uri: getGoogleRedirectUri(),
-          response_type: "id_token token",
-          scope: "openid email profile",
-          prompt: "select_account",
-          nonce: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        });
-        window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-        return;
-      } catch (err) {
-        console.warn("OAuth redirect failed, using fallback Google login:", err);
-      }
-    }
-
-    setTimeout(() => {
-      redirectToAnalyzePage();
-    }, 400);
+    window.location.assign(`${backendUrl}/auth/google/login`);
   };
 
   const handleFillDemo = () => {
