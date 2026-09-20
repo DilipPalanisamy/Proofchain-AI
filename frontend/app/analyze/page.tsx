@@ -324,6 +324,8 @@ export default function AnalyzePage() {
       setGlobalError(err.message || "ProofChain analysis failed. Verify backend services.");
       setIsRunningProofChain(false);
     }
+  };
+
   if (!isAuthenticated) {
     return (
       <div

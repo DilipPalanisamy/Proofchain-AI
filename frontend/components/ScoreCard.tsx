@@ -474,14 +474,14 @@ export const ScoreCard: React.FC<ScoreCardProps> = ({ analysis }) => {
               fontSize: "0.85rem",
               fontWeight: 700,
               color:
-                (weighted_contributions.relevance_adjustment ?? 0) >= 0
+                (effectiveWeightedContribs.relevance_adjustment ?? 0) >= 0
                   ? "var(--accent-emerald)"
                   : "var(--accent-rose)",
             }}
           >
-            {(weighted_contributions.relevance_adjustment ?? 0) > 0
-              ? `+${weighted_contributions.relevance_adjustment} pts`
-              : `${weighted_contributions.relevance_adjustment ?? 0} pts`}
+            {(effectiveWeightedContribs.relevance_adjustment ?? 0) > 0
+              ? `+${effectiveWeightedContribs.relevance_adjustment} pts`
+              : `${effectiveWeightedContribs.relevance_adjustment ?? 0} pts`}
           </span>
         </div>
       </div>

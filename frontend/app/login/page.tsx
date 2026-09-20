@@ -43,7 +43,7 @@ function decodeGoogleCredential(credential: string) {
   }
 }
 
-function redirectToAnalyzePage(customRedirect?: string | null) {
+function redirectToAnalyzePage() {
   if (typeof window === "undefined") return;
 
   localStorage.setItem("proofchain_logged_in", "true");
@@ -54,9 +54,7 @@ function redirectToAnalyzePage(customRedirect?: string | null) {
     basePath = basePath.slice(0, -1);
   }
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const redirectParam = customRedirect || urlParams.get("redirect") || "/analyze/";
-  let cleanRoute = redirectParam.startsWith("/") ? redirectParam : `/${redirectParam}`;
+  let cleanRoute = "/analyze/";
   if (!cleanRoute.endsWith("/")) {
     cleanRoute += "/";
   }
