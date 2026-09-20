@@ -16,7 +16,6 @@ import {
   FileCheck,
   Info,
 } from "lucide-react";
-import { backendUrl } from "../../lib/api";
 
 const GOOGLE_CLIENT_ID =
   process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
@@ -67,6 +66,17 @@ function LoginContent() {
     const credential = hashParams.get("id_token");
     const accessToken = hashParams.get("access_token");
     const profile = credential ? decodeGoogleCredential(credential) : null;
+    const oauthError = searchParams.get("error") || hashParams.get("error");
+
+    if (oauthError) {
+      setErrors({
+        general:
+          searchParams.get("error_description") ||
+          hashParams.get("error_description") ||
+          `Google sign-in failed: ${oauthError}`,
+      });
+      return;
+    }
 
     if (googleAuth === "success" || profile?.email) {
       const userEmail = profile?.email || searchParams.get("email") || "google_user@proofchain.ai";
@@ -141,7 +151,15 @@ function LoginContent() {
   };
 
   const handleGoogleClick = () => {
-    window.location.href = `${backendUrl}/auth/google/login`;
+    const params = new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID,
+      redirect_uri: getGoogleRedirectUri(),
+      response_type: "id_token token",
+      scope: "openid email profile",
+      prompt: "select_account",
+      nonce: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    });
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
   };
 
   const handleFillDemo = () => {
