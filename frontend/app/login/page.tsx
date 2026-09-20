@@ -125,10 +125,6 @@ function LoginContent() {
         });
       return;
     }
-
-    if (localStorage.getItem("proofchain_logged_in") === "true") {
-      redirectToDashboard();
-    }
   }, [searchParams, router]);
 
   // Validate fields
