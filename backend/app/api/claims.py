@@ -182,6 +182,17 @@ def get_claim_evidence(claim_id: str, db: Session = Depends(get_db)):
     return claim.evidence
 
 
+@router.get("/{claim_id}/analyze")
+@router.post("/{claim_id}/analyze")
+def analyze_claim_shortcut(claim_id: str, db: Session = Depends(get_db)):
+    """
+    Shortcut endpoint to analyze a claim via /claims/{claim_id}/analyze.
+    Delegates directly to the ProofChain analysis pipeline.
+    """
+    from app.api.analysis import analyze_claim as run_analysis
+    return run_analysis(claim_id=claim_id, db=db)
+
+
 @router.put("/{claim_id}", response_model=ClaimResponse)
 def update_claim(claim_id: str, claim_update: ClaimUpdate, db: Session = Depends(get_db)):
     """Update claim details or verification status."""

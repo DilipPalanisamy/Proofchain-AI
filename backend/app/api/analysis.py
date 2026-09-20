@@ -34,6 +34,9 @@ def parse_claim_id(raw_id: str) -> int:
 
 
 @router.post("/claim/{claim_id}")
+@router.get("/claim/{claim_id}")
+@router.post("/{claim_id}")
+@router.get("/{claim_id}")
 def analyze_claim(claim_id: str, db: Session = Depends(get_db)):
     """
     Complete Evidence Package Analysis API for ProofChain AI with Relevance Detection.
