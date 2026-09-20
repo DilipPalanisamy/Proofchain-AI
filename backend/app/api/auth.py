@@ -2,7 +2,7 @@ import os
 import json
 import urllib.request
 import urllib.parse
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
 
 router = APIRouter()
@@ -14,17 +14,22 @@ GOOGLE_CLIENT_SECRET = os.getenv(
     "GOOGLE_CLIENT_SECRET", ""
 )
 GOOGLE_REDIRECT_URI = os.getenv(
-    "GOOGLE_REDIRECT_URI", "http://localhost:8000/auth/google/callback"
+    "GOOGLE_REDIRECT_URI", ""
 )
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 
+def get_redirect_uri(request: Request) -> str:
+    """Use the configured URI or the actual public backend host."""
+    return GOOGLE_REDIRECT_URI or str(request.url_for("google_callback"))
+
+
 @router.get("/google/login", summary="Redirect to Google OAuth Consent Screen")
-def google_login():
+def google_login(request: Request):
     """Redirects the user to Google OAuth consent screen."""
     params = {
         "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "redirect_uri": get_redirect_uri(request),
         "response_type": "code",
         "scope": "openid email profile",
         "prompt": "select_account",
@@ -34,7 +39,7 @@ def google_login():
 
 
 @router.get("/google/callback", summary="Handle Google OAuth Callback")
-def google_callback(code: str = Query(..., description="Authorization code from Google")):
+def google_callback(request: Request, code: str = Query(..., description="Authorization code from Google")):
     """Exchanges Google authorization code for user info and redirects to frontend."""
     if not code:
         raise HTTPException(status_code=400, detail="Missing authorization code from Google.")
@@ -46,7 +51,7 @@ def google_callback(code: str = Query(..., description="Authorization code from 
         "client_secret": GOOGLE_CLIENT_SECRET,
         "code": code,
         "grant_type": "authorization_code",
-        "redirect_uri": GOOGLE_REDIRECT_URI,
+        "redirect_uri": get_redirect_uri(request),
     }).encode("utf-8")
 
     req = urllib.request.Request(
