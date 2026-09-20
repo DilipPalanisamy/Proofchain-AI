@@ -291,28 +291,13 @@ export async function fetchClaimEvidence(claimId: string | number): Promise<Evid
 
 export async function analyzeIndividualEvidence(evidenceId: string) {
   try {
-    const res = await fetch(`${BACKEND_URL}/evidence/${encodeURIComponent(evidenceId)}/extract`, {
+    const res = await fetch(`${BACKEND_URL}/ai/evidence/${encodeURIComponent(evidenceId)}`, {
       method: "POST",
     });
     if (!res.ok) throw new Error("Failed to run AI extraction");
     return await res.json();
   } catch {
-    return {
-      evidence_id: evidenceId,
-      ai_analysis: {
-        summary: "Multimodal AI extraction identified observable structural features and spatial alignment.",
-        observations: [
-          "Asphalt surface breach present with measurable depth",
-          "Street signage visible in background metadata",
-        ],
-        entities: ["Main Street", "Department of Transportation"],
-        location: "Main Street, Sector 4",
-        date: new Date().toISOString().slice(0, 10),
-        severity: "HIGH",
-        extraction_confidence: 94,
-        limitations: ["Audio recording lacks GPS spatial coordinates"],
-      },
-    };
+    throw new Error("AI evidence analysis is unavailable. Start the backend and try again.");
   }
 }
 
@@ -363,93 +348,5 @@ export async function analyzeClaim(claimId: string): Promise<ProofChainAnalysisR
     console.warn("POST /claims/analyze failed", err);
   }
 
-  // Comprehensive Offline Fallback Analysis Response
-  return {
-    claim_id: claimId || "CLM-2026-0011",
-    claim_title: "Pothole hazard on Main Street causing vehicular damage",
-    claim_description: "Community report regarding deep asphalt fissures and tire damage near school zone.",
-    evidence_count: 3,
-    final_score: 88,
-    result: "HIGH_STRENGTH",
-    result_description: "Robust evidence package with high fidelity, verified source reliability, strong topical relevance, and solid corroborating coverage.",
-    component_scores: {
-      quality_score: 92,
-      reliability_score: 88,
-      consistency_score: 95,
-      completeness_score: 85,
-      diversity_score: 80,
-      recency_score: 90,
-      relevance_score: 88,
-    },
-    weighted_contributions: {
-      quality: 18.4,
-      reliability: 17.6,
-      consistency: 14.25,
-      completeness: 12.75,
-      diversity: 12.0,
-      recency: 13.5,
-      relevance_adjustment: 3.6,
-    },
-    penalties: {
-      duplicate_penalty: 0,
-      contradiction_penalty: 0,
-      total_penalty: 0,
-    },
-    evidence_evaluations: [
-      {
-        evidence_id: "EVD-001",
-        evidence_title: "High-resolution photo of street fissure",
-        evidence_type: "IMAGE",
-        quality_score: 92,
-        reliability_score: 88,
-        relevance_score: 95,
-        relevance_classification: "RELEVANT",
-        relevance_justification: "Image explicitly depicts a 12-inch asphalt pit directly adjacent to school zone sign.",
-        observable_facts: ["Asphalt breach present", "Tire track alignment visible"],
-      },
-      {
-        evidence_id: "EVD-002",
-        evidence_title: "Municipal repair work log",
-        evidence_type: "DOCUMENT",
-        quality_score: 85,
-        reliability_score: 90,
-        relevance_score: 82,
-        relevance_classification: "RELEVANT",
-        relevance_justification: "Work order log documents pending asphalt patch requests filed 3 days prior.",
-        observable_facts: ["Work order #4091 pending", "Category: Road Surface Maintenance"],
-      },
-      {
-        evidence_id: "EVD-003",
-        evidence_title: "Traffic noise audio snippet",
-        evidence_type: "AUDIO",
-        quality_score: 70,
-        reliability_score: 65,
-        relevance_score: 45,
-        relevance_classification: "PARTIALLY_RELEVANT",
-        relevance_justification: "Audio captures vehicle impact sound but lacks spatial visual confirmation.",
-        observable_facts: ["High amplitude thud sound recorded at 08:14 AM"],
-      },
-    ],
-    similarities: [
-      {
-        evidence_a: "EVD-001",
-        evidence_b: "EVD-002",
-        similarity_score: 74,
-        relationship: "HIGHLY_SIMILAR",
-      },
-    ],
-    contradictions: [],
-    overall_score: 88,
-    overall_justification: "Strong multi-source corroboration combining visual photo evidence and municipal work logs.",
-    recommendation: "Evidence package meets high evidentiary standards across all evaluation criteria.",
-    recommendations: [
-      "Evidence package meets high evidentiary standards across all evaluation criteria.",
-      "Maintain evidence chain of custody for official verification audit.",
-    ],
-    limitations: [
-      "Evaluates evidence package structural strength, reliability, and consistency; does not declare absolute real-world ground truth.",
-      "Automated duplicate and contradiction penalties depend on provided metadata quality.",
-    ],
-    analyzed_at: new Date().toISOString(),
-  };
+  throw new Error("Evidence package analysis is unavailable. Start the backend and try again.");
 }
