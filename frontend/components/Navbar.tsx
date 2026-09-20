@@ -177,7 +177,8 @@ export function Navbar() {
 
         {isLoggedIn ? (
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <div
+            <Link
+              href="/login"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -189,13 +190,32 @@ export function Navbar() {
                 fontSize: "0.78rem",
                 color: "var(--accent-cyan)",
                 fontWeight: 600,
+                textDecoration: "none",
               }}
             >
               <User size={14} />
               <span style={{ maxWidth: "120px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {userEmail || "User"}
               </span>
-            </div>
+            </Link>
+            <Link
+              href="/login"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                padding: "6px 14px",
+                borderRadius: "var(--radius-sm)",
+                backgroundColor: "rgba(255, 255, 255, 0.05)",
+                border: "1px solid var(--border-color)",
+                fontSize: "0.82rem",
+                color: "#ffffff",
+                fontWeight: 600,
+                textDecoration: "none",
+              }}
+            >
+              Sign In
+            </Link>
             <button
               onClick={handleSignOut}
               title="Sign Out"
