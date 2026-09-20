@@ -84,7 +84,7 @@ export default function RootLayout({
 
           <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
             <Link
-              href="/"
+              href="/overview"
               style={{
                 display: "flex",
                 alignItems: "center",

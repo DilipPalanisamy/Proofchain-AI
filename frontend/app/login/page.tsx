@@ -45,7 +45,7 @@ function decodeGoogleCredential(credential: string) {
 
 function redirectToDashboard() {
   const loginPath = window.location.pathname.replace(/\/login\/?$/, "");
-  window.location.replace(`${loginPath}/dashboard/`);
+  window.location.replace(`${loginPath}/overview/`);
 }
 
 function LoginContent() {
@@ -135,7 +135,7 @@ function LoginContent() {
         localStorage.setItem("proofchain_logged_in", "true");
         localStorage.setItem("proofchain_user_email", cleanEmail || "demo@proofchain.ai");
       }
-      router.push("/dashboard");
+      router.push("/overview");
     }, 400);
   };
 
