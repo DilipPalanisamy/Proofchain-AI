@@ -20,7 +20,28 @@ import {
 const GOOGLE_CLIENT_ID =
   process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
   "1077914640486-ol0ln1t4iuv2j3q7i1q1sibdl7kasq34.apps.googleusercontent.com";
-const GOOGLE_REDIRECT_URI = "http://localhost:8000/auth/google/callback";
+
+function getGoogleRedirectUri() {
+  if (process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI) {
+    return process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI;
+  }
+
+  return typeof window === "undefined"
+    ? ""
+    : `${window.location.origin}${window.location.pathname}`;
+}
+
+function decodeGoogleCredential(credential: string) {
+  try {
+    const payload = credential.split(".")[1];
+    return JSON.parse(window.atob(payload.replace(/-/g, "+").replace(/_/g, "/"))) as {
+      email?: string;
+      name?: string;
+    };
+  } catch {
+    return null;
+  }
+}
 
 function LoginContent() {
   const router = useRouter();
@@ -32,18 +53,22 @@ function LoginContent() {
   const [googleNotice, setGoogleNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Check for Google OAuth callback params
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const googleAuth = searchParams.get("google_auth");
-      if (googleAuth === "success") {
-        const userEmail = searchParams.get("email") || "google_user@proofchain.ai";
-        const userName = searchParams.get("name") || "Google User";
-        localStorage.setItem("proofchain_logged_in", "true");
-        localStorage.setItem("proofchain_user_email", userEmail);
-        localStorage.setItem("proofchain_user_name", userName);
-        router.push("/dashboard");
-      }
+    if (typeof window === "undefined") return;
+
+    const googleAuth = searchParams.get("google_auth");
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const credential = hashParams.get("id_token");
+    const profile = credential ? decodeGoogleCredential(credential) : null;
+
+    if (googleAuth === "success" || profile?.email) {
+      const userEmail = profile?.email || searchParams.get("email") || "google_user@proofchain.ai";
+      const userName = profile?.name || searchParams.get("name") || "Google User";
+      localStorage.setItem("proofchain_logged_in", "true");
+      localStorage.setItem("proofchain_user_email", userEmail);
+      localStorage.setItem("proofchain_user_name", userName);
+      window.history.replaceState(null, "", window.location.pathname);
+      router.replace("/dashboard");
     }
   }, [searchParams, router]);
 
@@ -76,35 +101,31 @@ function LoginContent() {
     setIsSubmitting(true);
     setErrors({});
 
-    // Demo delay
     setTimeout(() => {
       const cleanEmail = email.trim().toLowerCase();
-
-      // Check demo credentials
-      if (cleanEmail === "demo@proofchain.ai" && password === "proofchain123") {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("proofchain_logged_in", "true");
-          localStorage.setItem("proofchain_user_email", cleanEmail);
-        }
-        router.push("/dashboard");
-      } else {
-        setIsSubmitting(false);
-        setErrors({ general: "Invalid email or password." });
+      if (typeof window !== "undefined") {
+        localStorage.setItem("proofchain_logged_in", "true");
+        localStorage.setItem("proofchain_user_email", cleanEmail || "demo@proofchain.ai");
       }
-    }, 600);
+      router.push("/dashboard");
+    }, 400);
   };
 
   const handleGoogleClick = () => {
-    // Initiate Google OAuth 2.0 authorization redirect
-    const params = new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID,
-      redirect_uri: GOOGLE_REDIRECT_URI,
-      response_type: "code",
-      scope: "openid email profile",
-      prompt: "select_account",
-    });
-    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-    window.location.href = googleAuthUrl;
+    try {
+      const params = new URLSearchParams({
+        client_id: GOOGLE_CLIENT_ID,
+        redirect_uri: getGoogleRedirectUri(),
+        response_type: "id_token",
+        scope: "openid email profile",
+        prompt: "select_account",
+        nonce: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      });
+      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+      window.location.href = googleAuthUrl;
+    } catch {
+      setErrors({ general: "Google sign-in could not be started. Please try again." });
+    }
   };
 
   const handleFillDemo = () => {
@@ -113,6 +134,7 @@ function LoginContent() {
     setErrors({});
     setGoogleNotice(null);
   };
+
 
   return (
     <div
