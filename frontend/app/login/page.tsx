@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   ShieldCheck,
@@ -17,14 +17,35 @@ import {
   Info,
 } from "lucide-react";
 
-export default function LoginPage() {
+const GOOGLE_CLIENT_ID =
+  process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ||
+  "1077914640486-ol0ln1t4iuv2j3q7i1q1sibdl7kasq34.apps.googleusercontent.com";
+const GOOGLE_REDIRECT_URI = "http://localhost:8000/auth/google/callback";
+
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
   const [googleNotice, setGoogleNotice] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Check for Google OAuth callback params
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const googleAuth = searchParams.get("google_auth");
+      if (googleAuth === "success") {
+        const userEmail = searchParams.get("email") || "google_user@proofchain.ai";
+        const userName = searchParams.get("name") || "Google User";
+        localStorage.setItem("proofchain_logged_in", "true");
+        localStorage.setItem("proofchain_user_email", userEmail);
+        localStorage.setItem("proofchain_user_name", userName);
+        router.push("/dashboard");
+      }
+    }
+  }, [searchParams, router]);
 
   // Validate fields
   const validate = () => {
@@ -74,7 +95,16 @@ export default function LoginPage() {
   };
 
   const handleGoogleClick = () => {
-    setGoogleNotice("Google sign-in will be connected in the production version.");
+    // Initiate Google OAuth 2.0 authorization redirect
+    const params = new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID,
+      redirect_uri: GOOGLE_REDIRECT_URI,
+      response_type: "code",
+      scope: "openid email profile",
+      prompt: "select_account",
+    });
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
+    window.location.href = googleAuthUrl;
   };
 
   const handleFillDemo = () => {
@@ -497,5 +527,27 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            maxWidth: "500px",
+            margin: "0 auto",
+            padding: "80px 24px",
+            textAlign: "center",
+            color: "var(--text-muted)",
+          }}
+        >
+          Loading ProofChain AI Login...
+        </div>
+      }
+    >
+      <LoginContent />
+    </Suspense>
   );
 }

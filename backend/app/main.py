@@ -14,6 +14,7 @@ from app.api.claims import router as claims_router
 from app.api.evidence import router as evidence_router
 from app.api.analysis import router as analysis_router
 from app.api.ai import router as ai_router
+from app.api.auth import router as auth_router
 from app.api import api_router
 
 
@@ -49,6 +50,12 @@ init_db()
 # ---------------------------------------------------------
 # Direct API endpoints
 # ---------------------------------------------------------
+
+app.include_router(
+    auth_router,
+    prefix="/auth",
+    tags=["Authentication"]
+)
 
 app.include_router(
     claims_router,
