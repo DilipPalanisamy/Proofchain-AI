@@ -1,1 +1,3 @@
 -r backend/requirements.txt
+-e ./backend
+
