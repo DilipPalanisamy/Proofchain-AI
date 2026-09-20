@@ -16,3 +16,5 @@ services:
         value: 1077914640486-ol0ln1t4iuv2j3q7i1q1sibdl7kasq34.apps.googleusercontent.com
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+      - key: GEMINI_API_KEY
+        sync: false

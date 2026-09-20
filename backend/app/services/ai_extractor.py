@@ -42,6 +42,11 @@ def analyze_evidence(file_path: str, evidence_type: str):
 
     client = get_client()
 
+    if client is None:
+        if not os.getenv("GEMINI_API_KEY"):
+            raise RuntimeError("GEMINI_API_KEY is not configured on the backend")
+        raise RuntimeError("Google GenAI SDK is not installed on the backend")
+
     path = Path(file_path)
 
     if not path.exists():
