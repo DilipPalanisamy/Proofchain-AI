@@ -69,6 +69,11 @@ function LoginContent() {
       localStorage.setItem("proofchain_user_name", userName);
       window.history.replaceState(null, "", window.location.pathname);
       router.replace("/dashboard");
+      return;
+    }
+
+    if (localStorage.getItem("proofchain_logged_in") === "true") {
+      router.replace("/dashboard");
     }
   }, [searchParams, router]);
 
