@@ -36,7 +36,7 @@ jobs:
 
       - name: Build frontend
         env:
-          NEXT_PUBLIC_BACKEND_URL: https://proofchain-ai-backend.onrender.com
+          NEXT_PUBLIC_BACKEND_URL: https://proofchain-ai.onrender.com
         run: npm run build
 
       - name: Upload Pages artifact

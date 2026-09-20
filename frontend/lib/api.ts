@@ -134,22 +134,9 @@ export interface AddEvidenceInput {
 }
 
 export async function fetchClaims(): Promise<Claim[]> {
-  try {
-    const res = await fetch(`${BACKEND_URL}/claims`);
-    if (!res.ok) throw new Error("Failed to fetch claims");
-    return await res.json();
-  } catch {
-    return [
-      {
-        id: 11,
-        claim_id: "CLM-2026-0011",
-        title: "Pothole hazard on Main Street causing vehicular damage",
-        description: "Multiple community reports indicate severe road damage requiring urgent repair.",
-        status: "INVESTIGATING",
-        created_at: new Date().toISOString(),
-      },
-    ];
-  }
+  const res = await fetch(`${BACKEND_URL}/claims`);
+  if (!res.ok) throw new Error(`Failed to fetch claims (${res.status})`);
+  return await res.json();
 }
 
 export async function createClaim(
@@ -167,16 +154,8 @@ export async function createClaim(
     });
     if (!res.ok) throw new Error("Failed to create claim");
     return await res.json();
-  } catch {
-    const idNum = Math.floor(Math.random() * 9000) + 1000;
-    return {
-      id: idNum,
-      claim_id: `CLM-2026-${idNum}`,
-      title,
-      description: desc,
-      status: "INVESTIGATING",
-      created_at: new Date().toISOString(),
-    };
+  } catch (err) {
+    throw err instanceof Error ? err : new Error("Failed to create claim");
   }
 }
 
@@ -193,18 +172,8 @@ export async function addEvidence(input: AddEvidenceInput): Promise<EvidenceItem
     }
 
     return await res.json();
-  } catch {
-    const evNum = Math.floor(Math.random() * 900) + 100;
-    return {
-      id: evNum,
-      evidence_id: `EVD-${evNum}`,
-      claim_id: String(input.claim_id),
-      title: input.description || "Evidence Artifact",
-      evidence_type: input.type || "DOCUMENT",
-      description: input.description,
-      source: input.source || "User Upload",
-      created_at: new Date().toISOString(),
-    };
+  } catch (err) {
+    throw err instanceof Error ? err : new Error("Failed to attach evidence");
   }
 }
 
@@ -235,20 +204,8 @@ export async function uploadEvidenceFile(
     });
     if (!res.ok) throw new Error("Failed to upload evidence file");
     return await res.json();
-  } catch {
-    const evNum = Math.floor(Math.random() * 900) + 100;
-    const fileName = file ? file.name : "uploaded_document.pdf";
-    return {
-      id: evNum,
-      evidence_id: `EVD-${evNum}`,
-      claim_id: typeof claimIdOrFormData === "string" || typeof claimIdOrFormData === "number" ? String(claimIdOrFormData) : "CLM-2026-0011",
-      title: title || fileName,
-      evidence_type: evidenceType || "DOCUMENT",
-      file_path: fileName,
-      file_type: file?.type,
-      file_size: file?.size,
-      uploaded_at: new Date().toISOString(),
-    };
+  } catch (err) {
+    throw err instanceof Error ? err : new Error("Failed to upload evidence file");
   }
 }
 
@@ -257,35 +214,8 @@ export async function fetchClaimEvidence(claimId: string | number): Promise<Evid
     const res = await fetch(`${BACKEND_URL}/claims/${encodeURIComponent(String(claimId))}/evidence`);
     if (!res.ok) throw new Error("Failed to fetch evidence");
     return await res.json();
-  } catch {
-    return [
-      {
-        id: 1,
-        evidence_id: "EVD-001",
-        claim_id: String(claimId),
-        title: "High-resolution photo of street fissure",
-        evidence_type: "IMAGE",
-        file_name: "road_damage_photo.png",
-        description: "Photograph of deep road crack near school zone sign.",
-        source: "Community Reporter",
-        quality_score: 92,
-        reliability_score: 88,
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: 2,
-        evidence_id: "EVD-002",
-        claim_id: String(claimId),
-        title: "Municipal repair work log",
-        evidence_type: "DOCUMENT",
-        file_name: "municipal_repair_log.pdf",
-        description: "Department of Transportation work order log for asphalt repairs.",
-        source: "City Open Data",
-        quality_score: 85,
-        reliability_score: 90,
-        created_at: new Date().toISOString(),
-      },
-    ];
+  } catch (err) {
+    throw err instanceof Error ? err : new Error("Failed to fetch evidence");
   }
 }
 
@@ -309,15 +239,8 @@ export async function seedDemoClaim(): Promise<Claim> {
     });
     if (!res.ok) throw new Error("Failed to seed demo claim");
     return await res.json();
-  } catch {
-    return {
-      id: 11,
-      claim_id: "CLM-2026-0011",
-      title: "Pothole hazard on Main Street causing vehicular damage",
-      description: "Deep asphalt fissure observed near school zone causing tire damage and traffic slowdown.",
-      status: "INVESTIGATING",
-      created_at: new Date().toISOString(),
-    };
+  } catch (err) {
+    throw err instanceof Error ? err : new Error("Failed to seed demo claim");
   }
 }
 
