@@ -2,8 +2,19 @@ import json
 import os
 from pathlib import Path
 
-from google import genai
-from google.genai import types
+try:
+    from google import genai
+    from google.genai import types
+    HAS_GENAI = True
+except ImportError:
+    try:
+        import google.generativeai as genai
+        types = None
+        HAS_GENAI = True
+    except ImportError:
+        genai = None
+        types = None
+        HAS_GENAI = False
 
 
 MODEL_NAME = "gemini-3.7-flash"
@@ -12,12 +23,11 @@ MODEL_NAME = "gemini-3.7-flash"
 def get_client():
     api_key = os.getenv("GEMINI_API_KEY")
 
-    if not api_key:
-        raise RuntimeError(
-            "GEMINI_API_KEY is not configured in backend/.env"
-        )
+    if not api_key or not HAS_GENAI:
+        return None
 
     return genai.Client(api_key=api_key)
+
 
 
 def analyze_evidence(file_path: str, evidence_type: str):
