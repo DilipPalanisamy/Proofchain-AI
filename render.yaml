@@ -11,7 +11,7 @@ services:
       - key: FRONTEND_URL
         value: https://dilippalanisamy.github.io/Proofchain-AI
       - key: GOOGLE_REDIRECT_URI
-        value: https://proofchain-ai-backend.onrender.com/auth/google/callback
+        value: https://proofchain-ai.onrender.com/auth/google/callback
       - key: GOOGLE_CLIENT_ID
         value: 1077914640486-ol0ln1t4iuv2j3q7i1q1sibdl7kasq34.apps.googleusercontent.com
       - key: GOOGLE_CLIENT_SECRET

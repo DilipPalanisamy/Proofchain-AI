@@ -116,7 +116,7 @@ export interface ProofChainAnalysisResponse {
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ||
   (process.env.NODE_ENV === "production"
-    ? "https://proofchain-ai-backend.onrender.com"
+    ? "https://proofchain-ai.onrender.com"
     : "http://localhost:8000");
 
 export const backendUrl = BACKEND_URL;

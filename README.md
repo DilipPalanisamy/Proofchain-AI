@@ -150,6 +150,6 @@ npm run dev
 Create a Google OAuth Web application and add these authorized redirect URIs:
 
 - `http://localhost:8000/auth/google/callback`
-- `https://proofchain-ai-backend.onrender.com/auth/google/callback`
+- `https://proofchain-ai.onrender.com/auth/google/callback`
 
 Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in the backend environment. For the Render deployment, enter both values in the `proofchain-ai-backend` service environment variables. The frontend never receives the client secret.
