@@ -1,6 +1,41 @@
 # ProofChain AI
 
-ProofChain AI is an intelligent fact-checking, claim verification, and evidence chain analysis platform. It leverages NLP, semantic similarity matching, contradiction detection, and credibility scoring to evaluate the validity of claims against supporting or disputing evidence.
+> **"Evidence you can inspect. Decisions you can trust."**  
+> *From evidence to transparent decisions.*
+
+ProofChain AI is an auditable evidence-intelligence and claim-verification platform. It ingests multi-source documentation, computes semantic similarity, detects factual contradictions, performs automated evidence relevance checks, and synthesizes a transparent, deterministic credibility score (0–100) with step-by-step explainability.
+
+---
+
+## 🔑 Demo Access & Navigation
+
+### Hackathon Demo Credentials
+- **Email:** `demo@proofchain.ai`
+- **Password:** `proofchain123`
+
+### Navigation Routes
+- **Sign In / Login:** `/login`
+- **Account Registration:** `/register`
+- **Claim Analysis Workspace:** `/analyze`
+- **Evidence Intelligence Dashboard:** `/dashboard`
+
+---
+
+## 🏛 Auditable Verification Architecture
+
+```text
+       CLAIM
+         ↓
+      EVIDENCE
+         ↓
+     AI ANALYSIS (Gemini 3.7 Flash)
+         ↓
+    RELEVANCE & SIMILARITY AUDIT
+         ↓
+   CONTRADICTION DETECTION
+         ↓
+    PROOFCHAIN CREDIBILITY SCORE (0-100)
+```
 
 ---
 
@@ -11,49 +46,56 @@ proofchain-ai/
 │
 ├── frontend/
 │   ├── app/
-│   │   ├── page.tsx            # Home / Landing overview
+│   │   ├── page.tsx            # Platform Landing Page
+│   │   ├── login/
+│   │   │   └── page.tsx        # Split-screen Login UI with demo credentials
+│   │   ├── register/
+│   │   │   └── page.tsx        # Account Registration UI
 │   │   ├── analyze/
-│   │   │   └── page.tsx        # Claim analysis workspace
+│   │   │   └── page.tsx        # End-to-end Claim Creation & Evidence Ingestion Workspace
 │   │   └── dashboard/
-│   │       └── page.tsx        # Claims & evidence dashboard
+│   │       └── page.tsx        # Evidence Intelligence Dashboard & Session Guard
 │   │
 │   ├── components/
-│   │   ├── ClaimInput.tsx      # Claim input & query submission
-│   │   ├── EvidenceUpload.tsx  # Evidence file / text ingestion
-│   │   ├── EvidenceCard.tsx    # Individual evidence presentation
-│   │   ├── ScoreCard.tsx       # Credibility & confidence metrics
-│   │   └── EvidenceChain.tsx   # Visualized chain of reasoning
+│   │   ├── ClaimInput.tsx      # Claim formulation component
+│   │   ├── EvidenceUpload.tsx  # Multi-file evidence uploader (PNG, JPG, PDF, TXT, DOCX)
+│   │   ├── EvidenceCard.tsx    # Evidence metadata & observation display
+│   │   ├── ScoreCard.tsx       # Multi-factor credibility score & metrics
+│   │   └── EvidenceChain.tsx   # Step-by-step visual chain of reasoning
 │   │
 │   └── lib/
-│       └── api.ts              # Frontend API client
+│       └── api.ts              # Type-safe API client for ProofChain backend
 │
 ├── backend/
 │   ├── app/
-│   │   ├── main.py             # FastAPI entrypoint & router setup
+│   │   ├── main.py             # FastAPI entrypoint & CORS middleware
 │   │   │
 │   │   ├── api/
-│   │   │   ├── claims.py       # Claim CRUD & management endpoints
-│   │   │   ├── evidence.py     # Evidence ingestion & query endpoints
-│   │   │   └── analysis.py     # ProofChain analysis & verification endpoints
+│   │   │   ├── claims.py       # Claim management & demo seed endpoints
+│   │   │   ├── evidence.py     # Multi-format file ingestion & verification
+│   │   │   ├── ai.py           # Gemini 3.7 Flash evidence analysis endpoint
+│   │   │   └── analysis.py     # ProofChain analysis pipeline endpoint
 │   │   │
 │   │   ├── models/
 │   │   │   ├── claim.py        # SQLAlchemy Claim entity
 │   │   │   └── evidence.py     # SQLAlchemy Evidence entity
 │   │   │
 │   │   ├── schemas/
-│   │   │   ├── claim.py        # Pydantic schemas for Claims
-│   │   │   └── evidence.py     # Pydantic schemas for Evidence & Analysis
+│   │   │   ├── claim.py        # Pydantic validation schemas for Claims
+│   │   │   └── evidence.py     # Pydantic schemas for Evidence
+│   │   │   └── analysis.py     # Pydantic schemas for ProofChain Analysis
 │   │   │
 │   │   ├── services/
-│   │   │   ├── evidence_analyzer.py  # Evidence parsing & reasoning pipeline
-│   │   │   ├── similarity.py         # Semantic similarity engine
-│   │   │   ├── contradiction.py      # Contradiction detection engine
-│   │   │   └── scoring.py            # Credibility scoring algorithm
+│   │   │   ├── ai_extractor.py # Gemini 3.7 Flash multimodal factual extraction
+│   │   │   ├── relevance.py    # Semantic relevance & keyword overlap calculator
+│   │   │   ├── similarity.py   # SentenceTransformers embedding similarity
+│   │   │   ├── contradiction.py# Polar discrepancy & negation clash audit
+│   │   │   └── scoring.py      # Weighted deterministic scoring algorithm
 │   │   │
-│   │   └── database.py         # DB connection & session handling
+│   │   └── database.py         # SQLite database & session manager
 │   │
-│   ├── requirements.txt        # Python backend dependencies
-│   └── .env                    # Backend configuration environment
+│   ├── requirements.txt        # Backend dependencies
+│   └── .env                    # Environment configuration
 │
 ├── README.md
 └── .gitignore
@@ -61,56 +103,42 @@ proofchain-ai/
 
 ---
 
-## 🚀 Getting Started
+## ⚡ Key Features & Capabilities
 
-### Backend Setup (FastAPI)
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv .venv
-   # Windows:
-   .venv\Scripts\activate
-   # Linux / macOS:
-   source .venv/bin/activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Configure `.env` if needed (default SQLite database is configured).
-5. Start the FastAPI server:
-   ```bash
-   uvicorn app.main:app --reload --port 8000
-   ```
-   API Docs will be available at: `http://localhost:8000/docs`
+1. **Multimodal Evidence Ingestion & AI Extraction**: Uses `gemini-3.7-flash` to extract observable facts, entity relations, dates, and locations without hallucinating verdict conclusions.
+2. **Semantic Relevance Detection**: Ensures uploaded evidence is contextually relevant to the claim before allowing it to influence the score (`RELEVANT`, `PARTIALLY_RELEVANT`, `IRRELEVANT`).
+3. **Redundancy & Duplicate Audit**: Detects duplicate or near-identical evidence items using `SentenceTransformers` embeddings.
+4. **Contradiction Detection**: Surfacing polar clashes, negation flips, and factual refutations across evidence sources.
+5. **Deterministic Scoring Engine**: Calculates an auditable score (0–100) based on weighted contributions of quality, reliability, consistency, completeness, diversity, recency, and contradiction penalties.
+6. **Auditable Visual Dashboard**: Presents evidence chain links, score breakdowns, duplicate pairings, contradictions, limitations, and recommendations.
 
 ---
 
-### Frontend Setup (Next.js)
+## 🚀 Running Locally
 
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the Next.js development server:
-   ```bash
-   npm run dev
-   ```
-   Access the frontend at: `http://localhost:3000`
+### 1. Backend Setup (FastAPI)
 
----
+```bash
+cd backend
+python -m venv .venv
 
-## ⚡ Core Features
+# Windows:
+.venv\Scripts\activate
+# Linux/macOS:
+source .venv/bin/activate
 
-- **Semantic Similarity Analysis**: Measures contextual alignment between claims and provided evidence sources.
-- **Contradiction Detection**: Identifies factual inconsistencies, semantic refutations, and opposing stances.
-- **Multi-Factor Credibility Scoring**: Combines source reliability, semantic relevance, consensus weight, and contradiction penalties.
-- **Evidence Chain Visualization**: Builds an auditable, step-by-step verification trail showing how the verdict was derived.
+pip install -r requirements.txt
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+- API Documentation: `http://127.0.0.1:8000/docs`
+- Health Check: `http://127.0.0.1:8000/health`
+
+### 2. Frontend Setup (Next.js)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+- Web Application: `http://localhost:3000`
+- Login Page: `http://localhost:3000/login`
