@@ -43,7 +43,7 @@ function decodeGoogleCredential(credential: string) {
   }
 }
 
-function redirectToDashboard(customRedirect?: string | null) {
+function redirectToAnalyzePage(customRedirect?: string | null) {
   if (typeof window === "undefined") return;
 
   localStorage.setItem("proofchain_logged_in", "true");
@@ -99,7 +99,7 @@ function LoginContent() {
       localStorage.setItem("proofchain_user_email", userEmail);
       localStorage.setItem("proofchain_user_name", userName);
       window.history.replaceState(null, "", window.location.pathname);
-      redirectToDashboard();
+      redirectToAnalyzePage();
       return;
     }
 
@@ -115,13 +115,13 @@ function LoginContent() {
           localStorage.setItem("proofchain_user_email", emailToUse);
           localStorage.setItem("proofchain_user_name", nameToUse);
           window.history.replaceState(null, "", window.location.pathname);
-          redirectToDashboard();
+          redirectToAnalyzePage();
         })
         .catch(() => {
           localStorage.setItem("proofchain_logged_in", "true");
           localStorage.setItem("proofchain_user_email", "google_user@proofchain.ai");
           localStorage.setItem("proofchain_user_name", "Google User");
-          redirectToDashboard();
+          redirectToAnalyzePage();
         });
       return;
     }
@@ -162,7 +162,7 @@ function LoginContent() {
         localStorage.setItem("proofchain_logged_in", "true");
         localStorage.setItem("proofchain_user_email", cleanEmail || "demo@proofchain.ai");
       }
-      redirectToDashboard();
+      redirectToAnalyzePage();
     }, 400);
   };
 
@@ -200,7 +200,7 @@ function LoginContent() {
     }
 
     setTimeout(() => {
-      redirectToDashboard();
+      redirectToAnalyzePage();
     }, 400);
   };
 

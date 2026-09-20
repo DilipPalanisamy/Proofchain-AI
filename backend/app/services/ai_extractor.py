@@ -7,6 +7,14 @@ try:
     from google.genai import types
     HAS_GENAI = True
 except ImportError:
+    try:
+        import google.generativeai as genai
+        types = None
+        HAS_GENAI = True
+    except ImportError:
+        genai = None
+        types = None
+        HAS_GENAI = False
     genai = None
     types = None
     HAS_GENAI = False
