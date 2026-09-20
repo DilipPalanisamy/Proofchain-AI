@@ -5,6 +5,8 @@
 
 ProofChain AI is an auditable evidence-intelligence and claim-verification platform. It ingests multi-source documentation, computes semantic similarity, detects factual contradictions, performs automated evidence relevance checks, and synthesizes a transparent, deterministic credibility score (0–100) with step-by-step explainability.
 
+**Live Demo:** [Open ProofChain AI](https://dilippalanisamy.github.io/Proofchain-AI/)
+
 ---
 
 ## 🔑 Demo Access & Navigation
