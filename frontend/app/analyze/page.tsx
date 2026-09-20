@@ -58,6 +58,20 @@ interface UploadedEvidenceState extends EvidenceItem {
 export default function AnalyzePage() {
   const router = useRouter();
 
+  // Authentication check
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const loggedIn = localStorage.getItem("proofchain_logged_in");
+      if (loggedIn !== "true") {
+        router.push("/login?redirect=/analyze");
+      } else {
+        setIsAuthenticated(true);
+      }
+    }
+  }, [router]);
+
   // Workflow state
   const [claimTitle, setClaimTitle] = useState("");
   const [claimDescription, setClaimDescription] = useState("");
@@ -307,7 +321,24 @@ export default function AnalyzePage() {
       setGlobalError(err.message || "ProofChain analysis failed. Verify backend services.");
       setIsRunningProofChain(false);
     }
-  };
+  if (!isAuthenticated) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          minHeight: "60vh",
+          gap: "16px",
+          color: "var(--text-secondary)",
+        }}
+      >
+        <Loader2 size={32} className="animate-spin" color="var(--accent-cyan)" />
+        <p style={{ fontSize: "0.95rem" }}>Verifying session & loading investigation workspace...</p>
+      </div>
+    );
+  }
 
   return (
     <div style={{ maxWidth: "1080px", margin: "0 auto", padding: "36px 24px 80px" }}>

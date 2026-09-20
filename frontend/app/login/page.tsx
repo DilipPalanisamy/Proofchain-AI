@@ -43,7 +43,7 @@ function decodeGoogleCredential(credential: string) {
   }
 }
 
-function redirectToDashboard() {
+function redirectToDashboard(customRedirect?: string | null) {
   if (typeof window === "undefined") return;
 
   localStorage.setItem("proofchain_logged_in", "true");
@@ -54,7 +54,11 @@ function redirectToDashboard() {
     basePath = basePath.slice(0, -1);
   }
 
-  const targetUrl = `${basePath}/overview/`;
+  const urlParams = new URLSearchParams(window.location.search);
+  const redirectParam = customRedirect || urlParams.get("redirect") || "/analyze";
+  const cleanRoute = redirectParam.startsWith("/") ? redirectParam : `/${redirectParam}`;
+
+  const targetUrl = `${basePath}${cleanRoute}`;
   window.location.replace(targetUrl);
 }
 

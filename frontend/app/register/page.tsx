@@ -70,7 +70,7 @@ export default function RegisterPage() {
         localStorage.setItem("proofchain_user_name", name.trim());
         localStorage.setItem("proofchain_user_email", email.trim().toLowerCase());
       }
-      router.push("/overview");
+      router.push("/analyze");
     }, 500);
   };
 
