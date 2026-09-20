@@ -9,10 +9,16 @@ export default function HomePage() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const isLoggedIn = localStorage.getItem("proofchain_logged_in") === "true";
+      const pathname = window.location.pathname;
+      let basePath = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+      if (basePath.endsWith("/login") || basePath.endsWith("/analyze") || basePath.endsWith("/overview")) {
+        basePath = basePath.replace(/\/(login|analyze|overview)\/?$/, "");
+      }
+
       if (isLoggedIn) {
-        router.replace("/analyze");
+        window.location.replace(`${basePath}/analyze/`);
       } else {
-        router.replace("/login");
+        window.location.replace(`${basePath}/login/`);
       }
     }
   }, [router]);

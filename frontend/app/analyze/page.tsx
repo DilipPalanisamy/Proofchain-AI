@@ -65,7 +65,10 @@ export default function AnalyzePage() {
     if (typeof window !== "undefined") {
       const loggedIn = localStorage.getItem("proofchain_logged_in");
       if (loggedIn !== "true") {
-        router.push("/login?redirect=/analyze");
+        const pathname = window.location.pathname;
+        let basePath = pathname.replace(/\/analyze\/?$/, "");
+        if (basePath.endsWith("/")) basePath = basePath.slice(0, -1);
+        window.location.replace(`${basePath}/login/?redirect=/analyze/`);
       } else {
         setIsAuthenticated(true);
       }

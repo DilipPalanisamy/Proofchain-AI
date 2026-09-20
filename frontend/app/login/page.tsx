@@ -55,11 +55,14 @@ function redirectToAnalyzePage(customRedirect?: string | null) {
   }
 
   const urlParams = new URLSearchParams(window.location.search);
-  const redirectParam = customRedirect || urlParams.get("redirect") || "/analyze";
-  const cleanRoute = redirectParam.startsWith("/") ? redirectParam : `/${redirectParam}`;
+  const redirectParam = customRedirect || urlParams.get("redirect") || "/analyze/";
+  let cleanRoute = redirectParam.startsWith("/") ? redirectParam : `/${redirectParam}`;
+  if (!cleanRoute.endsWith("/")) {
+    cleanRoute += "/";
+  }
 
   const targetUrl = `${basePath}${cleanRoute}`;
-  window.location.replace(targetUrl);
+  window.location.href = targetUrl;
 }
 
 function LoginContent() {
