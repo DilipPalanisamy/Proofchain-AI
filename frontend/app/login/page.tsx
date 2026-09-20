@@ -43,6 +43,11 @@ function decodeGoogleCredential(credential: string) {
   }
 }
 
+function redirectToDashboard() {
+  const loginPath = window.location.pathname.replace(/\/login\/?$/, "");
+  window.location.replace(`${loginPath}/dashboard/`);
+}
+
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -59,6 +64,7 @@ function LoginContent() {
     const googleAuth = searchParams.get("google_auth");
     const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     const credential = hashParams.get("id_token");
+    const accessToken = hashParams.get("access_token");
     const profile = credential ? decodeGoogleCredential(credential) : null;
 
     if (googleAuth === "success" || profile?.email) {
@@ -68,12 +74,29 @@ function LoginContent() {
       localStorage.setItem("proofchain_user_email", userEmail);
       localStorage.setItem("proofchain_user_name", userName);
       window.history.replaceState(null, "", window.location.pathname);
-      router.replace("/dashboard");
+      redirectToDashboard();
+      return;
+    }
+
+    if (accessToken) {
+      fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((googleProfile) => {
+          if (!googleProfile?.email) return;
+          localStorage.setItem("proofchain_logged_in", "true");
+          localStorage.setItem("proofchain_user_email", googleProfile.email);
+          localStorage.setItem("proofchain_user_name", googleProfile.name || "Google User");
+          window.history.replaceState(null, "", window.location.pathname);
+          redirectToDashboard();
+        })
+        .catch(() => setErrors({ general: "Google sign-in could not be completed. Please try again." }));
       return;
     }
 
     if (localStorage.getItem("proofchain_logged_in") === "true") {
-      router.replace("/dashboard");
+      redirectToDashboard();
     }
   }, [searchParams, router]);
 
@@ -121,7 +144,7 @@ function LoginContent() {
       const params = new URLSearchParams({
         client_id: GOOGLE_CLIENT_ID,
         redirect_uri: getGoogleRedirectUri(),
-        response_type: "id_token",
+        response_type: "id_token token",
         scope: "openid email profile",
         prompt: "select_account",
         nonce: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
