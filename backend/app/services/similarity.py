@@ -1,4 +1,3 @@
-from sentence_transformers import SentenceTransformer
 from typing import Dict
 
 
@@ -11,6 +10,8 @@ def get_model():
     global _model
 
     if _model is None:
+        from sentence_transformers import SentenceTransformer
+
         _model = SentenceTransformer(MODEL_NAME)
 
     return _model
